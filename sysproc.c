@@ -89,3 +89,14 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+int
+sys_get_sched_data(void)
+{
+  // int index;
+  // if (argint(0, &index) < 0)
+  //   return -1;
+
+  // return myproc()->time_slice;
+  return get_sched_data();
+}

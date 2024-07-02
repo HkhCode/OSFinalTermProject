@@ -23,7 +23,7 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
-void cps(void);
+int get_sched_data(void);
 
 // ulib.c
 int stat(const char*, struct stat*);

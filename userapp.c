@@ -1,22 +1,54 @@
-// user/hello.c
+// user/matrix_mul.c
 #include "types.h"
 #include "stat.h"
 #include "user.h"
+#include "syscall.h"
+#define SIZE 3
+
+void multiply(int a[SIZE][SIZE], int b[SIZE][SIZE], int result[SIZE][SIZE], int row) {
+    for(int j = 0; j < SIZE; j++) {
+        result[row][j] = 0;
+        for(int k = 0; k < SIZE; k++) {
+            result[row][j] += a[row][k] * b[k][j];
+        }
+    }
+}
 
 int main(void) {
-    int x = 0;
+    int sched_data = get_sched_data();
+    int a[SIZE][SIZE] = {
+        {1, 2, 3},
+        {4, 5, 6},
+        {7, 8, 9}
+    };
 
-    for(int i = 0; i < 10; i++) {
-        for(int j = 0; j < 10; j++) {
-            for(int k = 0; k < 10; k++) {
-                x += 1;
+    int b[SIZE][SIZE] = {
+        {9, 8, 7},
+        {6, 5, 4},
+        {3, 2, 1}
+    };
+
+    int result[SIZE][SIZE];
+
+    for(int i = 0; i < SIZE; i++) {
+        if(fork() == 0) {
+            multiply(a, b, result, i);
+            printf(1, "Row %d computed by process %d: ", i, getpid());
+            for(int j = 0; j < SIZE; j++) {
+                printf(1, "%d ", result[i][j]);
             }
+            printf(1, "\n");
+            exit();
         }
     }
 
-    printf(1, "The value of x is: %d\n", x);
+    for(int i = 0; i < SIZE; i++) {
+        wait();
+    }
+    printf(1 , "%d\n" , sched_data);
     exit();
 }
+
 
 
 // #include <stdio.h> 
