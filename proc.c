@@ -16,6 +16,7 @@ int cscount = 0;
 static struct proc *initproc;
 
 int nextpid = 1;
+int done = 1; // check if any process hase finished or not
 extern void forkret(void);
 extern void trapret(void);
 
@@ -275,6 +276,7 @@ void exit(void)
 
   // Jump into the scheduler, never to return.
   curproc->state = ZOMBIE;
+  done = 1;
   sched();
   panic("zombie exit");
 }
@@ -337,7 +339,7 @@ int wait(void)
 
 void scheduler(void)
 {
-
+  int multi = 1; // multiply the time slice for yielded processes
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
@@ -346,12 +348,26 @@ void scheduler(void)
   {
     // Enable interrupts on this processor.
     sti();
+    if (done == 0)
+    {
+      multi = 2;
+    }
+    else
+    {
+      multi = 1;
+      done = 0;
+    }
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
     for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
     {
       if (p->state != RUNNABLE)
         continue;
+      if (p->yielded == 1)
+      {
+        p->time_slice *= multi;
+        p->time_remain = p->time_slice;
+      }
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
@@ -403,8 +419,13 @@ void sched(void)
 void yield(void)
 {
   acquire(&ptable.lock); // DOC: yieldlock
-  myproc()->state = RUNNABLE;
-  sched();
+  myproc()->time_remain -= 1;
+  if (myproc()->time_remain == 0)
+  {
+    myproc()->yielded = 1;
+    myproc()->state = RUNNABLE;
+    sched();
+  }
   release(&ptable.lock);
 }
 
