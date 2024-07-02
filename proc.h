@@ -51,7 +51,7 @@ struct proc {
   char name[16];               // Process name (debugging)
   int time_slice;              // time slice to perfrom extended RR on process
   int time_remain;             // remaining time of rr time slice
-  int yielded;                 // check if proccess is yielded in rr
+  int yielded;                 // check if process is yielded in rr
 };
 
 // Process memory is laid out contiguously, low addresses first:

@@ -15,6 +15,7 @@ struct {
 static struct proc *initproc;
 
 int nextpid = 1;
+int done=1;   //check if any process hase finished or not 
 extern void forkret(void);
 extern void trapret(void);
 
@@ -267,6 +268,7 @@ exit(void)
 
   // Jump into the scheduler, never to return.
   curproc->state = ZOMBIE;
+  done=1;
   sched();
   panic("zombie exit");
 }
@@ -326,8 +328,8 @@ wait(void)
 void
 scheduler(void)
 {
-  int multi=1;  //multiply the time slice for yielded proccesses
-  int done=1;   //check if any proccess hase finished or not 
+  int multi=1;  //multiply the time slice for yielded processes
+  
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
