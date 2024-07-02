@@ -3,55 +3,100 @@
 #include "stat.h"
 #include "user.h"
 #include "syscall.h"
-#define SIZE 3
+#define SIZE 5
 
-void multiply(int a[SIZE][SIZE], int b[SIZE][SIZE], int result[SIZE][SIZE], int row) {
-    for(int j = 0; j < SIZE; j++) {
-        result[row][j] = 0;
-        for(int k = 0; k < SIZE; k++) {
-            result[row][j] += a[row][k] * b[k][j];
-        }
-    }
-}
+// void multiply(int a[SIZE][SIZE], int b[SIZE][SIZE], int result[SIZE][SIZE], int row)
+// {
+//     int x = 0;
+//     for (int j = 0; j < SIZE; j++)
+//     {
+//         result[row][j] = 0;
+//         for (int k = 0; k < SIZE; k++)
+//         {
+//             for (int i = 0; i < 1000; i++)
+//             {
+//                 for (int j = 0; j < 1000; j++)
+//                 {
+//                     x = 10000 * 10000;
+//                 }
+//                 x += 1;
+//             }
+//             result[row][j] += a[row][k] * b[k][j];
+//         }
+//     }
+// }
 
-int main(void) {
+int main(void)
+{
+
     int sched_data = get_sched_data();
-    int a[SIZE][SIZE] = {
-        {1, 2, 3},
-        {4, 5, 6},
-        {7, 8, 9}
-    };
+    // int a[SIZE][SIZE] = {
+    //     {101, 102, 103, 114, 114},
+    //     {104, 105, 106, 102, 105},
+    //     {107, 108, 109, 106, 108},
+    //     {104, 105, 106, 102, 105},
+    //     {107, 108, 109, 106, 108}};
 
-    int b[SIZE][SIZE] = {
-        {9, 8, 7},
-        {6, 5, 4},
-        {3, 2, 1}
-    };
+    // int b[SIZE][SIZE] = {
+    //     {119, 118, 711, 500, 200},
+    //     {116, 115, 114, 324, 455},
+    //     {116, 112, 111, 123, 234},
+    //     {115, 115, 114, 324, 455},
+    //     {113, 112, 111, 123, 234},
+    // };
 
-    int result[SIZE][SIZE];
+    // int result[SIZE][SIZE];
 
-    for(int i = 0; i < SIZE; i++) {
-        if(fork() == 0) {
-            multiply(a, b, result, i);
-            printf(1, "Row %d computed by process %d: ", i, getpid());
-            for(int j = 0; j < SIZE; j++) {
-                printf(1, "%d ", result[i][j]);
+    // for (int i = 0; i < SIZE; i++)
+    // {
+    //     if (fork() == 0)
+    //     {
+    //         multiply(a, b, result, i);
+    //         printf(1, "Row %d computed by process %d: ", i, getpid());
+    //         for (int j = 0; j < SIZE; j++)
+    //         {
+    //             printf(1, "%d ", result[i][j]);
+    //         }
+    //         printf(1, "\n");
+    //         exit();
+    //     }
+    // }
+
+    // for (int i = 0; i < SIZE; i++)
+    // {
+    //     wait();
+    // }
+    // printf(1, "%d\n", sched_data);
+    int pid;
+    int x = 0;
+    for (int k = 0; k < 100000; k++)
+    {
+        /* code */
+        pid = fork();
+        if (pid == 0)
+        {
+            for (int i = 0; i < 2147483640; i++)
+            {
+                for (int j = 0; j < 2147483640; j++)
+                {
+                    x = 10000 * 10000;
+                }
+                x += 1;
             }
-            printf(1, "\n");
             exit();
         }
+        
     }
-
-    for(int i = 0; i < SIZE; i++) {
+    printf(1 , "%d \n", sched_data);
+    sched_data +=1;
+    for (int i = 0; i < 100000; i++)
+    {
         wait();
     }
-    printf(1 , "%d\n" , sched_data);
     exit();
 }
 
-
-
-// #include <stdio.h> 
+// #include <stdio.h>
 // #include <stdlib.h>
 // #include <unistd.h>
 // #include<sys/wait.h>
@@ -95,7 +140,6 @@ int main(void) {
 
 //     int c_row=a_row,c_column=b_column;
 
-
 //     int shmid = shmget(SHM_KEY,sizeof(int)*c_row*c_column,0644|IPC_CREAT);
 //     if (shmid == -1) {
 //       perror("shared memory error");
@@ -128,7 +172,7 @@ int main(void) {
 //             sem_post(&write_sem);
 //             break;
 //         }
-        
+
 //     }
 //     if(pid!=0){
 //         wait(NULL);
@@ -152,4 +196,4 @@ int main(void) {
 //         return 0;
 //     }
 
-// } 
+// }
