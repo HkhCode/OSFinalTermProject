@@ -139,7 +139,9 @@ userinit(void)
   p->tf->esp = PGSIZE;
   p->tf->eip = 0;  // beginning of initcode.S
 
-  p->time_slice = 100;
+  p->time_slice = 1;
+  p->yielded = 0;
+  p->time_remain=1;
 
   safestrcpy(p->name, "initcode", sizeof(p->name));
   p->cwd = namei("/");
@@ -324,6 +326,8 @@ wait(void)
 void
 scheduler(void)
 {
+  int multi=1;  //multiply the time slice for yielded proccesses
+  int done=1;   //check if any proccess hase finished or not 
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
@@ -331,13 +335,21 @@ scheduler(void)
   for(;;){
     // Enable interrupts on this processor.
     sti();
-
+    if(done==0)
+      multi=2;
+    else {
+      multi=1;
+      done=0;
+    }
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE)
         continue;
-
+      if (p->yielded==1){
+        p->time_slice*=multi;
+        p->time_remain=p->time_slice;
+      }
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
@@ -388,8 +400,12 @@ void
 yield(void)
 {
   acquire(&ptable.lock);  //DOC: yieldlock
-  myproc()->state = RUNNABLE;
-  sched();
+  myproc()->time_remain--;
+  if(myproc()->time_remain=0){
+    myproc()->yielded=1;
+    myproc()->state = RUNNABLE;
+    sched();
+  }
   release(&ptable.lock);
 }
 
