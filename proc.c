@@ -403,7 +403,7 @@ yield(void)
 {
   acquire(&ptable.lock);  //DOC: yieldlock
   myproc()->time_remain--;
-  if(myproc()->time_remain=0){
+  if(myproc()->time_remain==0){
     myproc()->yielded=1;
     myproc()->state = RUNNABLE;
     sched();
@@ -551,4 +551,8 @@ procdump(void)
     }
     cprintf("\n");
   }
+  // void userAppCore(void) 
+  // {
+  //   cprintf("TEst");
+  // }
 }
